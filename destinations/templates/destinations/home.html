@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Featured Carousel -->
+    {% if featured_places %}
+    <div class="carousel-container">
+        <h2 class="section-title">Featured Destinations</h2>
+        <div class="carousel">
+            {% for place in featured_places %}
+            <div class="carousel-item">
+                <a href="{% url 'place_detail' place.pk %}">
+                    <img src="{{ place.image.url }}" alt="{{ place.name }}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                    <div class="carousel-caption">
+                        <h3>{{ place.name }}</h3>
+                        <p>{{ place.district }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-btn prev" onclick="moveCarousel(-1)">❮</button>
+        <button class="carousel-btn next" onclick="moveCarousel(1)">❯</button>
+    </div>
+    {% endif %}
+
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-container">
+        <form method="get" class="search-form">
+            <div class="search-inputs">
+                <input type="text" name="search" placeholder="Search places..." value="{{ search_query }}" class="search-input">
+                <select name="category" class="filter-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+                <select name="district" class="filter-select">
+                    <option value="">All Districts</option>
+                    {% for district in districts %}
+                    <option value="{{ district }}" {% if district_filter == district %}selected{% endif %}>{{ district }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="search-btn">Search</button>
+                {% if search_query or category_filter or district_filter %}
+                <a href="{% url 'home' %}" class="clear-btn">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <h1 class="main-title">Popular Tourist Places in Tamil Nadu</h1>
+    
+    <!-- Results count -->
+    {% if places %}
+    <p class="results-count">{{ places.paginator.count }} places found</p>
+    {% endif %}
+
+    <div class="grid">
+        {% for place in places %}
+        <div class="card">
+            <a href="{% url 'place_detail' place.pk %}">
+                <img src="{{ place.image.url }}" alt="{{ place.name }}" class="card-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+            </a>
+            <div class="card-body">
+                <div class="card-header">
+                    <h2 class="card-title">{{ place.name }}</h2>
+                    {% if user.is_authenticated %}
+                    <button class="favorite-btn {% if place.id in user_favorites %}active{% endif %}" 
+                            onclick="toggleFavorite('{{ place.id }}', this)">
+                        ❤
+                    </button>
+                    {% endif %}
+                </div>
+                <p class="card-meta">{{ place.district }} | {{ place.category }}</p>
+                <p class="card-desc">{{ place.short_description|truncatechars:100 }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-results">
+            <p>No tourist places found matching your criteria.</p>
+            <a href="{% url 'home' %}" class="btn">View All Places</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if places.has_other_pages %}
+    <div class="pagination">
+        {% if places.has_previous %}
+        <a href="?page={{ places.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if district_filter %}&district={{ district_filter }}{% endif %}" class="page-link">❮ Previous</a>
+        {% endif %}
+        
+        <span class="page-info">
+            Page {{ places.number }} of {{ places.paginator.num_pages }}
+        </span>
+        
+        {% if places.has_next %}
+        <a href="?page={{ places.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if district_filter %}&district={{ district_filter }}{% endif %}" class="page-link">Next ❯</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentSlide = 0;
+
+function moveCarousel(direction) {
+    const items = document.querySelectorAll('.carousel-item');
+    currentSlide += direction;
+    
+    if (currentSlide >= items.length) currentSlide = 0;
+    if (currentSlide < 0) currentSlide = items.length - 1;
+    
+    items.forEach((item, index) => {
+        item.style.transform = `translateX(${100 * (index - currentSlide)}%)`;
+    });
+}
+
+function toggleFavorite(placeId, button) {
+    fetch(`/favorite/${placeId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            button.classList.toggle('active');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Auto-advance carousel
+setInterval(() => moveCarousel(1), 5000);
+</script>
+{% endblock %} 

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="/" class="back-link">&larr; Back to all places</a>
+    <div class="detail-card">
+        <img src="{{ place.image.url }}" alt="{{ place.name }}" class="detail-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+        <div class="detail-info">
+            <div class="detail-header">
+                <h1>{{ place.name }}</h1>
+                <div class="detail-actions">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'toggle_favorite' place.pk %}" class="favorite-btn-detail {% if is_favorite %}active{% endif %}">
+                        ❤
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'chatbot' %}?place_id={{ place.id }}" class="chatbot-btn-detail">
+                        💬 Ask Guide
+                    </a>
+                </div>
+            </div>
+            <p class="detail-meta">{{ place.district }} | {{ place.category }}</p>
+            <p class="detail-desc">{{ place.short_description }}</p>
+            
+            {% if place.detailed_description %}
+            <div class="detail-section">
+                <h3>About this place</h3>
+                <p>{{ place.detailed_description }}</p>
+            </div>
+            {% endif %}
+            
+            {% if place.how_to_reach %}
+            <div class="detail-section">
+                <h3>🚗 How to Reach</h3>
+                <p>{{ place.how_to_reach }}</p>
+            </div>
+            {% endif %}
+            
+            {% if place.best_time_to_visit %}
+            <div class="detail-section">
+                <h3>⏰ Best Time to Visit</h3>
+                <p>{{ place.best_time_to_visit }}</p>
+            </div>
+            {% endif %}
+            
+            {% if place.entry_fee %}
+            <div class="detail-section">
+                <h3>💰 Entry Fee</h3>
+                <p>{{ place.entry_fee }}</p>
+            </div>
+            {% endif %}
+            
+            {% if place.timings %}
+            <div class="detail-section">
+                <h3>🕐 Timings</h3>
+                <p>{{ place.timings }}</p>
+            </div>
+            {% endif %}
+            
+            {% if place.nearby_attractions %}
+            <div class="detail-section">
+                <h3>🏛️ Nearby Attractions</h3>
+                <p>{{ place.nearby_attractions }}</p>
+            </div>
+            {% endif %}
+            
+            {% if place.accommodation %}
+            <div class="detail-section">
+                <h3>🏨 Accommodation</h3>
+                <p>{{ place.accommodation }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.detail-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.chatbot-btn-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.chatbot-btn-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.detail-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.detail-section h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.detail-section p {
+    margin: 0;
+    line-height: 1.6;
+    color: #555;
+}
+</style>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %} 
